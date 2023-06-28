@@ -1,7 +1,8 @@
 import React from "react";
 // import logo from './logo.svg';
-import { SearchBar } from "../SearchBar";
-import { SearchResults } from "../SearchResults";
+import { SearchBar } from "../SearchBar/SearchBar";
+import { SearchResults } from "../SearchResults/SearchResults";
+import { Playlist } from "../Playlist/Playlist";
 import "./App.css";
 
 class App extends React.Component {
@@ -18,6 +19,8 @@ class App extends React.Component {
             <SearchResults />
 
             {/*  Add a Playlist component  */}
+            <Playlist />
+
           </div>
         </div>
       </div>
