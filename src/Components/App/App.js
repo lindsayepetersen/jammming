@@ -2,6 +2,7 @@ import React from "react";
 import { SearchBar } from "../SearchBar/SearchBar";
 import { SearchResults } from "../SearchResults/SearchResults";
 import { Playlist } from "../Playlist/Playlist";
+import { Spotify } from "../../util/Spotify";
 import "./App.css";
 
 class App extends React.Component {
@@ -39,6 +40,10 @@ class App extends React.Component {
       ],
     };
     this.addTrack = this.addTrack.bind(this);
+    this.removeTrack = this.removeTrack.bind(this);
+    this.updatePlaylistName = this.updatePlaylistName.bind(this);
+    this.savePlaylist = this.savePlaylist.bind(this);
+    this.search = this.search.bind(this);
   }
 
   addTrack(track) {
@@ -46,8 +51,38 @@ class App extends React.Component {
       (playlistTrack) => playlistTrack.id === track.id
     );
     const newTrack = this.state.playlistTracks.concat(track);
-    foundTrack ? console.log("Track already exists") : this.setState({ playlistTracks: newTrack});
+    foundTrack 
+      ? console.log("Track already exists") 
+      : this.setState({ playlistTracks: newTrack });
+  }
 
+  removeTrack(track) {
+    const isPresent = this.state.playlistTracks.filter(
+      (playlistTrack) => playlistTrack.id !== track.id
+    );
+    this.setState({ playlistTracks: isPresent });
+  }
+
+  updatePlaylistName(name) {
+    this.setState({ playlistName: name });
+  }
+
+  savePlaylist() {
+    const trackURIs = this.state.playlistTracks.map(track => track.uri);
+    const name = this.state.playlistName;
+    Spotify.savePlaylistName(name, trackURIs).then(() => {
+      this.setState({
+        playlistName: "New Playlist",
+        playlistTracks: [],
+      });
+    });
+  }
+
+  search(term) {
+    Spotify.search(term).then((result) => {
+      this.setState({ searchResults: result });
+      // console.log(term);
+    });
   }
 
   render() {
@@ -58,7 +93,7 @@ class App extends React.Component {
         </h1>
         <div className="App">
           {/*  Add a SearchBar component  */}
-          <SearchBar />
+          <SearchBar onSearch={this.search} />
 
           <div className="App-playlist">
             {/*  Add a SearchResults component  */}
@@ -71,6 +106,9 @@ class App extends React.Component {
             <Playlist 
               playlistName={this.state.playlistName} 
               playlistTracks={this.state.playlistTracks} 
+              onRemove={this.removeTrack}
+              onNameChange={this.updatePlaylistName}
+              onSave={this.savePlaylist}
             />
           </div>
         </div>
